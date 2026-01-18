@@ -3,42 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Streamix Source</title>
+  <title>Streamix - Movix</title>
   
   <script src="security.js"></script>
-
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="welcome-screen" class="welcome-screen">
-    <div class="wave wave1"></div>
-    <div class="wave wave2"></div>
-    <div class="wave wave3"></div>
-
-    <div class="container">
-      <h1>Streamix</h1>
-      <p>Sélectionnez une plateforme</p>
-      
-      <button class="service-button" onclick="selectService('franime')">
-        Franime
-      </button>
-      
-      <button class="service-button" onclick="selectService('animesama')">
-        Anime Sama
-      </button>
-      
-      <button class="service-button" onclick="selectService('voiranime')">
-        Voiranime
-      </button>
-    </div>
-  </div>
-
-  <div id="app-container" class="app-container hidden">
-    <button id="back-home-btn" onclick="showWelcome()" title="Changer de service">
-      ↩
-    </button>
-
+  <div id="app-container" class="app-container">
+    
     <div class="loading-overlay" id="loading">
       <div class="spinner"></div>
     </div>
