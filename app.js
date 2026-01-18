@@ -1,5 +1,5 @@
 // ============================================
-// LOCALSTORAGE BRIDGE (Pour garder la mémoire)
+// LOCALSTORAGE BRIDGE (Conservé pour la stabilité)
 // ============================================
 const StorageBridge = {
   PREFIX: "streamix-",
@@ -17,63 +17,28 @@ const StorageBridge = {
 // LOGIQUE PRINCIPALE
 // ============================================
 
-// URLs des services
-const services = {
-  franime: "https://franime.fr/",
-  animesama: "https://anime-sama.pw/",
-  voiranime: "https://v6.voiranime.com/"
-};
+// URL unique
+const MOVIX_URL = "https://movix.blog/";
 
 // Éléments du DOM
-const welcomeScreen = document.getElementById("welcome-screen");
-const appContainer = document.getElementById("app-container");
 const serviceFrame = document.getElementById("service-frame");
 const loadingOverlay = document.getElementById("loading");
 
-// Initialisation
 document.addEventListener("DOMContentLoaded", () => {
-  // Vérifier si un service était déjà ouvert lors de la dernière session
-  const lastService = StorageBridge.get("last-service");
-  if (lastService && services[lastService]) {
-    selectService(lastService);
-  }
+  
+  // 1. On sauvegarde l'état dans le localStorage comme demandé
+  // Cela permet de garder la logique active si tu ajoutes d'autres options plus tard
+  StorageBridge.set("last-service", "movix");
 
-  // Masquer le chargement quand l'iframe est prête
+  // 2. Lancer le chargement de l'URL
+  serviceFrame.src = MOVIX_URL;
+
+  // 3. Masquer le chargement quand l'iframe est prête
   serviceFrame.addEventListener("load", () => {
-    loadingOverlay.classList.add("hidden");
+    // Petit délai pour assurer que le rendu visuel est fait
+    setTimeout(() => {
+        loadingOverlay.classList.add("hidden");
+    }, 500);
   });
+
 });
-
-// Sélectionner un service
-function selectService(serviceKey) {
-  const url = services[serviceKey];
-  if (!url) return;
-
-  // Sauvegarder le choix
-  StorageBridge.set("last-service", serviceKey);
-
-  // Afficher l'interface
-  welcomeScreen.classList.add("hidden");
-  appContainer.classList.remove("hidden");
-  loadingOverlay.classList.remove("hidden"); // Afficher chargement
-
-  // Charger l'URL
-  serviceFrame.src = url;
-}
-
-// Revenir à l'écran d'accueil
-function showWelcome() {
-  // Cacher l'app
-  appContainer.classList.add("hidden");
-  welcomeScreen.classList.remove("hidden");
-  
-  // Reset Iframe
-  serviceFrame.src = "about:blank";
-  
-  // Oublier le dernier service pour rester sur l'accueil au prochain lancement
-  localStorage.removeItem("streamix-last-service");
-}
-
-// Exposer les fonctions au HTML
-window.selectService = selectService;
-window.showWelcome = showWelcome;
