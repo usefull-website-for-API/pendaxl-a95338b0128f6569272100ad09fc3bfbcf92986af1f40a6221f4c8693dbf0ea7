@@ -1,44 +1,47 @@
 // ============================================
-// LOCALSTORAGE BRIDGE (Conservé pour la stabilité)
+// CONFIGURATION
 // ============================================
-const StorageBridge = {
-  PREFIX: "streamix-",
-  get: function(key) {
-    try { return JSON.parse(localStorage.getItem(this.PREFIX + key)); } 
-    catch { return localStorage.getItem(this.PREFIX + key); }
-  },
-  set: function(key, value) {
-    const stringValue = typeof value === "object" ? JSON.stringify(value) : value;
-    localStorage.setItem(this.PREFIX + key, stringValue);
-  }
-};
+const MOVIX_URL = "https://movix.blog/";
 
 // ============================================
 // LOGIQUE PRINCIPALE
 // ============================================
 
-// URL unique
-const MOVIX_URL = "https://movix.blog/";
-
-// Éléments du DOM
+// On récupère uniquement les éléments qui existent encore dans votre HTML
 const serviceFrame = document.getElementById("service-frame");
 const loadingOverlay = document.getElementById("loading");
 
+// Fonction pour arrêter le chargement (utilisée plusieurs fois)
+const stopLoading = () => {
+  if (loadingOverlay && !loadingOverlay.classList.contains("hidden")) {
+    loadingOverlay.classList.add("hidden");
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   
-  // 1. On sauvegarde l'état dans le localStorage comme demandé
-  // Cela permet de garder la logique active si tu ajoutes d'autres options plus tard
-  StorageBridge.set("last-service", "movix");
+  // 1. Sauvegarde pour la forme (optionnel, évite les erreurs si StorageBridge est absent)
+  if (typeof StorageBridge !== 'undefined') {
+      StorageBridge.set("last-service", "movix");
+  } else {
+      // Fallback simple si StorageBridge n'est pas défini
+      localStorage.setItem("streamix-last-service", "movix");
+  }
 
-  // 2. Lancer le chargement de l'URL
-  serviceFrame.src = MOVIX_URL;
+  // 2. Lancer le chargement du site
+  if (serviceFrame) {
+      serviceFrame.src = MOVIX_URL;
 
-  // 3. Masquer le chargement quand l'iframe est prête
-  serviceFrame.addEventListener("load", () => {
-    // Petit délai pour assurer que le rendu visuel est fait
-    setTimeout(() => {
-        loadingOverlay.classList.add("hidden");
-    }, 500);
-  });
+      // 3. Gestion de la fin du chargement
+      serviceFrame.onload = stopLoading;
+      serviceFrame.onerror = stopLoading;
+  }
+
+  // 4. SÉCURITÉ : Forcer l'arrêt du chargement après 4 secondes
+  // C'est ça qui va empêcher le chargement infini si le site bloque
+  setTimeout(() => {
+    stopLoading();
+    console.log("Chargement forcé terminé (Timeout de sécurité)");
+  }, 4000);
 
 });
